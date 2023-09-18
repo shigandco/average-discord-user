@@ -29,21 +29,14 @@ function fetchData(id:string) {
 
 router
     .all('*', preflight)
-    .get('/v1/:id', (handler) => {
+    .get('/v1/:id/default.json', (handler) => {
             return fetchData(handler.params.id)
     })
 export default {
     port: 3001,
     fetch: (request: RequestLike) => router
         .handle(request)
-
-        // transform unformed responses
         .then(json)
-
-        // catch any errors
         .catch(error)
-
-        // add CORS headers to all requests,
-        // including errors
         .then(corsify)
 }
