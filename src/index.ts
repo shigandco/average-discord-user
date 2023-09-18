@@ -44,6 +44,28 @@ function fetchData(id: string) {
   });
 }
 
+router.all("*", preflight).get("/v1/:id/avatar.png", async (handler) => {
+  try {
+    const userData = await fetchData(handler.params.id); 
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+    const imageResponse = await fetch(avatarUrl);
+    if (imageResponse.ok) {
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const response = new Response(imageBuffer, {
+        headers: {
+          "Content-Type": "image/png",
+        },
+      });
+
+      return response;
+    } else {
+      return "fuck you"
+    }
+  } catch (error) {
+    return "no image?"
+  }
+});
+
 router.all("*", preflight).get("/v1/:id/default.json", (handler) => {
   return fetchData(handler.params.id);
 });
