@@ -1,0 +1,17 @@
+{
+  "name": "average-discord-user",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "scripts": {
+    "main": "bun run index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "itty-router": "^4.0.23"
+  }
+}
