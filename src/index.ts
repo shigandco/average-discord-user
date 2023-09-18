@@ -1,5 +1,5 @@
 import { createCors, error, json, RequestLike, Router } from 'itty-router'
-import token from "./config.json"
+import token from "../config.json"
 
 const baseurl = 'https://discord.com/api/v10/users/'
 const { preflight, corsify } = createCors({

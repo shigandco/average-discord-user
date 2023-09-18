@@ -6,7 +6,7 @@
     "bun-types": "latest"
   },
   "scripts": {
-    "main": "bun run index.ts"
+    "main": "bun run src/index.ts"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
