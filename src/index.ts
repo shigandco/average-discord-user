@@ -22,7 +22,7 @@ interface badgeApiResponse {
 const baseurl = "https://discord.com/api/v10/users/";
 const { preflight, corsify } = createCors({
   methods: ["GET", "PATCH", "POST"],
-  origins: ["http://localhost:3001"],
+  origins: ["*"],
 });
 
 const router = Router();
@@ -44,27 +44,54 @@ function fetchData(id: string) {
   });
 }
 
-router.all("*", preflight).get("/v1/:id/avatar.png", async (handler) => {
+router.all("*", preflight).get("/v1/:id/avatar", async (handler) => {
   try {
-    const userData = await fetchData(handler.params.id); 
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
-    const imageResponse = await fetch(avatarUrl);
-    if (imageResponse.ok) {
-      const imageBuffer = await imageResponse.arrayBuffer();
-      const response = new Response(imageBuffer, {
+    const userData = await fetchData(handler.params.id);
+    const gifAvatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.gif`;
+    const pngAvatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
+
+    const gifImageResponse = await fetch(gifAvatarUrl);
+
+    if (gifImageResponse.ok) {
+      const gifImageBuffer = await gifImageResponse.arrayBuffer();
+      const gifResponse = new Response(gifImageBuffer, {
         headers: {
-          "Content-Type": "image/png",
+          "Content-Type": "image/gif",
         },
       });
-
-      return response;
+      return gifResponse;
     } else {
-      return "fuck you"
+      const pngImageResponse = await fetch(pngAvatarUrl);
+      if (pngImageResponse.ok) {
+        const pngImageBuffer = await pngImageResponse.arrayBuffer();
+        const pngResponse = new Response(pngImageBuffer, {
+          headers: {
+            "Content-Type": "image/png",
+          },
+        });
+        return pngResponse;
+      } else {
+        const defaultImageUrl = "https://discord.com/assets/c09a43a372ba81e3018c3151d4ed4773.png";
+        const defaultImageResponse = await fetch(defaultImageUrl);
+        if (defaultImageResponse.ok) {
+          const defaultImageBuffer = await defaultImageResponse.arrayBuffer();
+          const defaultResponse = new Response(defaultImageBuffer, {
+            headers: {
+              "Content-Type": "image/png",
+            },
+          });
+          return defaultResponse;
+        } else {
+          return "internal error";
+        }
+      }
     }
   } catch (error) {
-    return "no image?"
+    return "internal error";
   }
 });
+
+
 
 router.all("*", preflight).get("/v1/:id/default.json", (handler) => {
   return fetchData(handler.params.id);
