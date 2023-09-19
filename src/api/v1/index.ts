@@ -63,12 +63,12 @@ router.get("/:id/avatar.png", async (handler) => {
           });
           return defaultResponse;
         } else {
-          return "internal error";
+          return error(500);
         }
       }
     }
-  } catch (error) {
-    return "internal error";
+  } catch (_) {
+    return error(500);
   }
 });
 
@@ -92,20 +92,22 @@ router.get("/:id.json", async (handler) => {
       );
   }
 
-  const modBadges = (await fetch(
-    `https://clientmodbadges-api.herokuapp.com/users/${data.id}`
-  ).then((res) => res.json())) as badgeApiResponse;
-  Object.entries(modBadges).forEach((badgeData) => {
-    badgeData[1].forEach((badge: string | iClientModBadge) => {
-      if (typeof badge === "string") {
-        data.client_mod_badges[
-          badge
-        ] = `https://clientmodbadges-api.herokuapp.com/badges/${badgeData[0]}/${badge}`;
-      } else {
-        data.client_mod_badges[badge.name] = badge.badge;
-      }
+  try {
+    const modBadges = (await fetch(
+      `https://clientmodbadges-api.herokuapp.com/users/${data.id}`
+    ).then((res) => res.json())) as badgeApiResponse;
+    Object.entries(modBadges).forEach((badgeData) => {
+      badgeData[1].forEach((badge: string | iClientModBadge) => {
+        if (typeof badge === "string") {
+          data.client_mod_badges[
+            badge
+          ] = `https://clientmodbadges-api.herokuapp.com/badges/${badgeData[0]}/${badge}`;
+        } else {
+          data.client_mod_badges[badge.name] = badge.badge;
+        }
+      });
     });
-  });
+  } catch (_) {}
 
   return data;
 });
