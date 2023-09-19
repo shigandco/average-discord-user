@@ -1,6 +1,6 @@
 import { createCors, error, json, RequestLike, Router } from "itty-router";
 import { UserFlags, type APIUser } from "discord-api-types/v10";
-import config from "../../../config.json";
+import { authenticatedFetch } from "../../utils";
 
 interface ModifiedUser extends APIUser {
   flag_images: { [key: string]: string };
@@ -18,32 +18,15 @@ interface badgeApiResponse {
   [key: string]: string[] | objResponse[];
 }
 
-const baseurl = "https://discord.com/api/v10/users/";
-
 const router = Router({
   base: "/v1",
 });
 
-function fetchData(id: string) {
-  const url = baseurl + id;
-  const headers = {
-    Authorization: `Bot ${config.token}`,
-  };
-
-  return fetch(url, {
-    method: "GET",
-    headers: headers,
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json() as Promise<APIUser>;
-  });
-}
-
 router.get("/:id/avatar.png", async (handler) => {
   try {
-    const userData = await fetchData(handler.params.id);
+    const userData = (await authenticatedFetch(
+      `/users/${handler.params.id}`
+    )) as APIUser;
     const gifAvatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.gif`;
     const pngAvatarUrl = `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`;
 
@@ -90,11 +73,13 @@ router.get("/:id/avatar.png", async (handler) => {
 });
 
 router.get("/:id/default.json", (handler) => {
-  return fetchData(handler.params.id);
+  return authenticatedFetch(`/users/${handler.params.id}`);
 });
 
 router.get("/:id.json", async (handler) => {
-  const data = (await fetchData(handler.params.id)) as ModifiedUser;
+  const data = (await authenticatedFetch(
+    `/users/${handler.params.id}`
+  )) as ModifiedUser;
   data.flag_images = {};
   data.client_mod_badges = {};
 
