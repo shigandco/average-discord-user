@@ -6,7 +6,7 @@ import { notfound, serve } from "./utils";
 
 const { preflight, corsify } = createCors({
   methods: ["GET", "PATCH", "POST"],
-  origins: ["http://localhost:3001"],
+  origins: ["*"],
 });
 
 const router = Router();
