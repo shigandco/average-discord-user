@@ -1,7 +1,6 @@
 import { createCors, error, json, RequestLike, Router } from "itty-router";
 import { UserFlags, type APIUser } from "discord-api-types/v10";
 import config from "../../../config.json";
-import { flagToImage } from "./enums";
 
 interface ModifiedUser extends APIUser {
   flag_images: { [key: string]: string };
@@ -74,15 +73,14 @@ router.get("/:id/default.json", (handler) => {
 router.get("/:id.json", async (handler) => {
   const data = (await fetchData(handler.params.id)) as ModifiedUser;
   data.flag_images = {};
+  data.client_mod_badges = {};
 
   if (data.flags) {
     Object.keys(UserFlags)
       .filter((key) => data.flags! & UserFlags[key])
       .map(
         (image) =>
-          (data.flag_images[
-            image
-          ] = `https://raw.githubusercontent.com/efeeozc/discord-badges/main/png/${flagToImage[image]}.png`)
+          (data.flag_images[image] = `/badges/${image.toLowerCase()}.png`)
       );
   }
 
@@ -94,7 +92,7 @@ router.get("/:id.json", async (handler) => {
       if (typeof badge === "string") {
         data.client_mod_badges[
           badge
-        ] = `https://clientmodbadges-api.herokuapp.com/badges/${data[0]}/${badge}`;
+        ] = `https://clientmodbadges-api.herokuapp.com/badges/${badgeData[0]}/${badge}`;
       } else {
         data.client_mod_badges[badge.name] = badge.badge;
       }

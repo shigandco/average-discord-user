@@ -1,6 +1,8 @@
 import { createCors, error, json, RequestLike, Router } from "itty-router";
 
 import v1Router from "./api/v1";
+import { join } from "path";
+import { notfound, serve } from "./utils";
 
 const { preflight, corsify } = createCors({
   methods: ["GET", "PATCH", "POST"],
@@ -9,7 +11,14 @@ const { preflight, corsify } = createCors({
 
 const router = Router();
 
-router.all("/v1/*", v1Router.handle);
+router
+  .all("*", preflight)
+
+  .all("/v1/*", v1Router.handle)
+
+  .get("/*", serve("public"))
+
+  .all("*", () => error(404));
 
 export default {
   port: 3001,
