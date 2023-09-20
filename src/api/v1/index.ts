@@ -22,7 +22,7 @@ const router = Router({
   base: "/v1",
 });
 
-router.get("/:id/avatar", async (handler) => {
+router.get("/:id/avatar*", async (handler) => {
   if(handler.params.id === "@me"){
     return "im a shiggy (reference to im a teapot)"
   }
