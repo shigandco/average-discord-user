@@ -23,6 +23,9 @@ const router = Router({
 });
 
 router.get("/:id/avatar", async (handler) => {
+  if(handler.params.id === "@me"){
+    return "im a shiggy (reference to im a teapot)"
+  }
   try {
     const userData = (await authenticatedFetch(
       `/users/${handler.params.id}`
@@ -79,10 +82,16 @@ router.get("/:id/avatar", async (handler) => {
 });
 
 router.get("/:id/default.json", (handler) => {
+  if(handler.params.id === "@me"){
+    return "im a shiggy (reference to im a teapot)"
+  }
   return authenticatedFetch(`/users/${handler.params.id}`);
 });
 
 router.get("/:id.json", async (handler) => {
+  if(handler.params.id === "@me"){
+    return "im a shiggy (reference to im a teapot)"
+  }
   const data = (await authenticatedFetch(
     `/users/${handler.params.id}`
   )) as ModifiedUser;
